@@ -1,5 +1,4 @@
 import os
-import pandas as pd
 import pymysql
 import time
 import json
@@ -153,9 +152,8 @@ def update_history():
         sql = """insert into history (_date,confirm,suspect,heal,dead,confirm_add,suspect_add,heal_add,dead_add) values(%s,%s,%s,%s,%s,%s,%s,%s,%s)"""
         sql_query = """select confirm from history where ds=%s"""
         # sql_query = """show tables;"""
-
-        dic_df = pd.DataFrame([dic['2020-06-07']])
-        dic_df.to_csv('data.csv')
+        # dic_df = pd.DataFrame([dic['2020-06-07']])
+        # dic_df.to_csv('data.csv')
         for k, v in dic.items():
             # item 格式 {'2020-01-13': {'confirm': 41, 'suspect': 0, 'heal': 0, 'dead': 1}
             if not cursor.execute(sql_query, k):
