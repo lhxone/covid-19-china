@@ -2,6 +2,8 @@ import time
 import pymysql
 from decimal import Decimal
 import json
+
+
 def get_time():
     time_str = time.strftime("%Y{}%m{}%d{} %X")
     return time_str.format("年", "月", "日")
@@ -14,7 +16,7 @@ def get_conn():
     # 创建连接
     conn = pymysql.connect(host="localhost",
                            user="root",
-                           password="root",
+                           password="123456",
                            db="cov",
                            charset="utf8")
     # 创建游标
@@ -52,10 +54,11 @@ def get_c1_data():
           "sum(dead) " \
           "from details " \
           "where update_time=(select update_time from details order by update_time desc limit 1) "
+          #"where update_time=(select update_time from details order by update_time desc limit 1) "
     res = query(sql)
 
     res_list = [str(i) for i in res[0]]
-    res_tuple=tuple(res_list)
+    res_tuple = tuple(res_list)
     return res_tuple
 
 
@@ -109,6 +112,7 @@ def get_r2_data():
           "group by province"
     res = query(sql)
     return res
+
 
 if __name__ == "__main__":
     print(get_c1_data())

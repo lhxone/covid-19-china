@@ -6,7 +6,7 @@ var ec_center_option = {
     title: {
         text: '全国累计确诊地图',
         subtext: '',
-        x: 'left'
+        x: 'center'
     },
     tooltip: {
         trigger: 'item'

@@ -1,7 +1,9 @@
+import os
+import pandas as pd
 import pymysql
 import time
 import json
-import traceback  #追踪异常
+import traceback  # 追踪异常
 import requests
 
 
@@ -92,11 +94,11 @@ def update_details():
     cursor = None
     conn = None
     try:
-        li = get_tencent_data()[1]  #  0 是历史数据字典,1 最新详细数据列表
+        li = get_tencent_data()[1]  # 0 是历史数据字典,1 最新详细数据列表
         conn, cursor = get_conn()
-        sql = "insert into details(update_time,province,city,confirm,confirm_add,heal,dead) values(%s,%s,%s,%s,%s,%s,%s)"
-        sql_query = 'select %s=(select update_time from details order by id desc limit 1)' #对比当前最大时间戳
-        cursor.execute(sql_query,li[0][0])
+        sql = """insert into details(update_time,province,city,confirm,confirm_add,heal,dead) values(%s,%s,%s,%s,%s,%s,%s)"""
+        sql_query = """select %s='(select update_time from details order by id desc limit 1)'"""  # 对比当前最大时间戳
+        cursor.execute(sql_query, li[0][0])
         if not cursor.fetchone()[0]:
             print(f"{time.asctime()}开始更新最新数据")
             for item in li:
@@ -122,12 +124,12 @@ def insert_history():
         dic = get_tencent_data()[0]  # 0 是历史数据字典,1 最新详细数据列表
         print(f"{time.asctime()}开始插入历史数据")
         conn, cursor = get_conn()
-        sql = "insert into history values(%s,%s,%s,%s,%s,%s,%s,%s,%s)"
+        sql = """insert into history values(%s,%s,%s,%s,%s,%s,%s,%s,%s)"""
         for k, v in dic.items():
             # item 格式 {'2020-01-13': {'confirm': 41, 'suspect': 0, 'heal': 0, 'dead': 1}
             cursor.execute(sql, [k, v.get("confirm"), v.get("confirm_add"), v.get("suspect"),
-                                    v.get("suspect_add"), v.get("heal"), v.get("heal_add"),
-                                    v.get("dead"), v.get("dead_add")])
+                                 v.get("suspect_add"), v.get("heal"), v.get("heal_add"),
+                                 v.get("dead"), v.get("dead_add")])
 
         conn.commit()  # 提交事务 update delete insert操作
         print(f"{time.asctime()}插入历史数据完毕")
@@ -145,17 +147,21 @@ def update_history():
     cursor = None
     conn = None
     try:
-        dic = get_tencent_data()[0]  #  0 是历史数据字典,1 最新详细数据列表
+        dic = get_tencent_data()[0]  # 0 是历史数据字典,1 最新详细数据列表
         print(f"{time.asctime()}开始更新历史数据")
         conn, cursor = get_conn()
-        sql = "insert into history values(%s,%s,%s,%s,%s,%s,%s,%s,%s)"
-        sql_query = "select confirm from history where ds=%s"
+        sql = """insert into history (_date,confirm,suspect,heal,dead,confirm_add,suspect_add,heal_add,dead_add) values(%s,%s,%s,%s,%s,%s,%s,%s,%s)"""
+        sql_query = """select confirm from history where ds=%s"""
+        # sql_query = """show tables;"""
+
+        dic_df = pd.DataFrame([dic['2020-06-07']])
+        dic_df.to_csv('data.csv')
         for k, v in dic.items():
             # item 格式 {'2020-01-13': {'confirm': 41, 'suspect': 0, 'heal': 0, 'dead': 1}
             if not cursor.execute(sql_query, k):
                 cursor.execute(sql, [k, v.get("confirm"), v.get("confirm_add"), v.get("suspect"),
-                                     v.get("suspect_add"), v.get("heal"), v.get("heal_add"),
-                                     v.get("dead"), v.get("dead_add")])
+                                 v.get("suspect_add"), v.get("heal"), v.get("heal_add"),
+                                 v.get("dead"), v.get("dead_add")])
         conn.commit()  # 提交事务 update delete insert操作
         print(f"{time.asctime()}历史数据更新完毕")
     except:
@@ -168,5 +174,3 @@ if __name__ == "__main__":
     #  insert_history()
     update_history()
     update_details()
-
-
