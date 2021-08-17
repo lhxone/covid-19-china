@@ -7,20 +7,16 @@ import requests
 
 
 def get_tencent_data():
-    """
-    :return: 返回历史数据和当日详细数据
-    """
     url = 'https://view.inews.qq.com/g2/getOnsInfo?name=disease_h5'
-    url_his = 'https://view.inews.qq.com/g2/getOnsInfo?name=disease_other'  # 加上这个history大兄弟++++++++
-
+    url_his = 'https://view.inews.qq.com/g2/getOnsInfo?name=disease_other'
     headers = {
         'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36',
     }
+
     r = requests.get(url, headers)
     res = json.loads(r.text)  # json字符串转字典
     data_all = json.loads(res['data'])
 
-    # 再加上history的配套东东++++++++
     r_his = requests.get(url_his, headers)
     res_his = json.loads(r_his.text)
     data_his = json.loads(res_his['data'])
@@ -30,7 +26,7 @@ def get_tencent_data():
     for i in data_his["chinaDayList"]:
         ds = "2020." + i["date"]
         tup = time.strptime(ds, "%Y.%m.%d")
-        ds = time.strftime("%Y-%m-%d", tup)  # 改变时间格式,不然插入数据库会报错，数据库是datetime类型
+        ds = time.strftime("%Y-%m-%d", tup)  # 改变时间格式
         confirm = i["confirm"]
         suspect = i["suspect"]
         heal = i["heal"]
@@ -149,17 +145,14 @@ def update_history():
         dic = get_tencent_data()[0]  # 0 是历史数据字典,1 最新详细数据列表
         print(f"{time.asctime()}开始更新历史数据")
         conn, cursor = get_conn()
-        sql = """insert into history (_date,confirm,suspect,heal,dead,confirm_add,suspect_add,heal_add,dead_add) values(%s,%s,%s,%s,%s,%s,%s,%s,%s)"""
+        sql = """insert into history (ds,confirm,suspect,heal,dead,confirm_add,suspect_add,heal_add,dead_add) values(%s,%s,%s,%s,%s,%s,%s,%s,%s)"""
         sql_query = """select confirm from history where ds=%s"""
-        # sql_query = """show tables;"""
-        # dic_df = pd.DataFrame([dic['2020-06-07']])
-        # dic_df.to_csv('data.csv')
         for k, v in dic.items():
-            # item 格式 {'2020-01-13': {'confirm': 41, 'suspect': 0, 'heal': 0, 'dead': 1}
+            # item 格式 {'2020-01-13': {'confirm': 41, 'suspect': 0, 'heal': 0, 'dead': 1}}
             if not cursor.execute(sql_query, k):
                 cursor.execute(sql, [k, v.get("confirm"), v.get("confirm_add"), v.get("suspect"),
-                                 v.get("suspect_add"), v.get("heal"), v.get("heal_add"),
-                                 v.get("dead"), v.get("dead_add")])
+                                     v.get("suspect_add"), v.get("heal"), v.get("heal_add"),
+                                     v.get("dead"), v.get("dead_add")])
         conn.commit()  # 提交事务 update delete insert操作
         print(f"{time.asctime()}历史数据更新完毕")
     except:

@@ -48,6 +48,7 @@ function get_l1_data() {
             ec_left1_Option.series[2].data=data.heal
             ec_left1_Option.series[3].data=data.dead
             ec_left1.setOption(ec_left1_Option)
+            console.log(data.day)
 		},
 		error: function(xhr, type, errorThrown) {
 

@@ -3,14 +3,19 @@ from flask import Flask
 from flask import request
 from flask import render_template
 from flask import jsonify
+from flask_bootstrap import Bootstrap
+import os
 import string
 
-app = Flask(__name__)
+os.system(
+    'python3 /Users/liuhaoxin/Documents/GitHub/covid-19-china/spider.py && python3 /Users/liuhaoxin/Documents/GitHub/covid-19-china/utils.py')
 
+app = Flask(__name__)
+bootstrap = Bootstrap(app)
 
 @app.route('/')
 def hello_world():
-    return render_template("main.html")
+    return render_template("demo.html")
 
 
 @app.route("/c1")
@@ -79,4 +84,5 @@ def get_time():
 
 
 if __name__ == '__main__':
-    app.run(host='127.0.0.1', port=5000)
+    # app.run(host='127.0.0.1', port=5000)
+    bootstrap.run()
