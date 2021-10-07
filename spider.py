@@ -162,6 +162,6 @@ def update_history():
 
 
 if __name__ == "__main__":
-    #  insert_history()
+    insert_history()
     update_history()
     update_details()
