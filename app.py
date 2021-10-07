@@ -8,7 +8,7 @@ import os
 import string
 
 os.system(
-    'python3 /Users/liuhaoxin/Documents/GitHub/covid-19-china/spider.py && python3 /Users/liuhaoxin/Documents/GitHub/covid-19-china/utils.py')
+    'python3 spider.py && python3 utils.py')
 
 app = Flask(__name__)
 bootstrap = Bootstrap(app)
